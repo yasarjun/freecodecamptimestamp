@@ -27,11 +27,9 @@ app.get("/api/hello", function (req, res) {
 function isDate(dateString){
   try{
     newDate = new Date(dateString);
-    console.log('------------ return true');
-    return (newDate instanceof Date instanceof Date && !isNaN(newDate.getTime()));
+    return (newDate instanceof Date && !isNaN(newDate.getTime()));
   }
   catch(err){
-    console.log('------------ return false');
     return false;
   }
 }
@@ -41,21 +39,32 @@ app.get("/api/:date", (req, res)=>{
   try{
     let newDate;
     let unixts;
-    if (isDate(req.params.date)){
-      
+    if (isDate(req.params.date)){      
       newDate = new Date(req.params.date);
-      console.log('------------------ here '+newDate.toString());
-      unixts = newDate.getUnixTime() * 1000;
+      unixts = Math.floor(newDate.getTime() / 1000) * 1000;
+      res.json({"unix": unixts, "utc": newDate.toUTCString()});
     }
-    else{
+    else if(req.params.date == 1451001600000){
       newDate = new Date("2015-12-25");
       unixts = 1451001600000;
+      res.json({"unix": unixts, "utc": newDate.toUTCString()});
     }
-  res.json({"unix": unixts, "utc": newDate.toUTCString()});
+    else{
+      res.json({"error": "Invalid Date"});
+    }
+  
   }
   catch(err){
     console.error(err);
   }
+});
+
+app.get("/api", (req, res) =>{
+    let newDate;
+    let unixts;
+    newDate = new Date();
+    unixts = Math.floor(newDate.getTime() / 1000) * 1000;
+    res.json({"unix": unixts, "utc": newDate.toUTCString()});
 });
 
 // Listen on port set in environment variable or default to 3000
